@@ -3,7 +3,13 @@ import pandas as pd
 import random
 from scipy.spatial import distance
 
-def ant_system(cities, k, num_of_tours, alpha, beta, p):
+def ant_system(cities: np.array,
+               k: int,
+               num_of_tours: int,
+               alpha: float,
+               beta: float,
+               p: float) -> float:
+
     num_of_cities = cities.shape[0]
 
     # calculate start level of the pheromone
@@ -97,7 +103,7 @@ def ant_system(cities, k, num_of_tours, alpha, beta, p):
     best_dist = list_of_ants[0]['dist_traveled']
     return best_dist
 
-def create_ants(num_of_ants, num_of_cities):
+def create_ants(num_of_ants: int, num_of_cities: int) -> list:
     list_of_ants = []
     for i in range(num_of_ants):
         rand_start_point = np.random.randint(0,num_of_cities-1)
@@ -109,7 +115,7 @@ def create_ants(num_of_ants, num_of_cities):
     return list_of_ants
 
 
-def restart_ants(list_of_ants, num_of_cities):
+def restart_ants(list_of_ants: list, num_of_cities: int) -> list:
     for ant in list_of_ants:
         ant['dist_traveled'] = 0
         ant["cities_left"] = list(range(num_of_cities))
@@ -118,7 +124,7 @@ def restart_ants(list_of_ants, num_of_cities):
     return list_of_ants
 
 
-def where_to_go(probabilities_table):
+def where_to_go(probabilities_table: np.array) -> int:
     rand_num = np.random.uniform(0,1)
     sum_of_probabilities = 0
     index_of_city = -1
@@ -137,7 +143,7 @@ def where_to_go(probabilities_table):
     return index_of_city
 
 
-def calc_distance_array(cities):
+def calc_distance_array(cities: np.array) -> np.array:
     num_of_cities = cities.shape[0]
     array_of_city_dist = np.zeros((num_of_cities, num_of_cities))
     for i in range(num_of_cities):
@@ -153,7 +159,7 @@ def calc_distance_array(cities):
 
 def main():
     # reading data
-    cities_file = np.loadtxt("cities_4.txt").T
+    cities_file = np.loadtxt("Data\cities_4.txt").T
 
     # num of: ants/ cities
     k = cities_file.shape[0]
