@@ -17,8 +17,8 @@ def ant_system(cities: np.array,
     max_dist = np.nanmax(array_dist_between_cities,axis=1)
     tau_0 = 1/max_dist
 
-    # create list of ants which will move through the cities
-    list_of_ants = create_ants(k,num_of_cities)
+    # create dictionary of ants which will move through the cities
+    dict_of_ants = create_ants(k,num_of_cities)
 
     # initialization of decision table
     array_base_pheromone = np.zeros((num_of_cities,num_of_cities))
@@ -31,7 +31,7 @@ def ant_system(cities: np.array,
                 array_base_pheromone[i][j] = tau_0[j]
 
     # in the first tour choose paths randomly
-    for ant in list_of_ants:
+    for ant in dict_of_ants:
         for i in range(num_of_cities-1):
             # draw city number
             city_idx = random.choice(ant['cities_left'])
@@ -55,10 +55,10 @@ def ant_system(cities: np.array,
 
     # main loop of the algorithm
     for tour in range(num_of_tours):
-        #list_of_ants = create_ants(k, num_of_cities)
-        list_of_ants = restart_ants(list_of_ants, num_of_cities)
+        #dict_of_ants = create_ants(k, num_of_cities)
+        dict_of_ants = restart_ants(dict_of_ants, num_of_cities)
 
-        for ant in list_of_ants:
+        for ant in dict_of_ants:
             for i in range(num_of_cities-1):
                 actual_city_idx = ant['path'][-1]
                 semi_decision_table = np.zeros(shape=(num_of_cities,1))
@@ -99,29 +99,29 @@ def ant_system(cities: np.array,
 
         array_whole_pheromone = p*array_whole_pheromone+array_pheromone
 
-    list_of_ants = sorted(list_of_ants, key=lambda ant: ant['dist_traveled'])
-    best_dist = list_of_ants[0]['dist_traveled']
+    dict_of_ants = sorted(dict_of_ants, key=lambda ant: ant['dist_traveled'])
+    best_dist = dict_of_ants[0]['dist_traveled']
     return best_dist
 
 def create_ants(num_of_ants: int, num_of_cities: int) -> list:
-    list_of_ants = []
+    dict_of_ants = []
     for i in range(num_of_ants):
         rand_start_point = np.random.randint(0,num_of_cities-1)
         start_dist = 0
         ant = {"start_point":rand_start_point,"dist_traveled":start_dist,
                "cities_left":list(range(num_of_cities)), "path":[rand_start_point]}
         ant['cities_left'].remove(ant['start_point'])
-        list_of_ants.append(ant)
-    return list_of_ants
+        dict_of_ants.append(ant)
+    return dict_of_ants
 
 
-def restart_ants(list_of_ants: list, num_of_cities: int) -> list:
-    for ant in list_of_ants:
+def restart_ants(dict_of_ants: list, num_of_cities: int) -> list:
+    for ant in dict_of_ants:
         ant['dist_traveled'] = 0
         ant["cities_left"] = list(range(num_of_cities))
         ant['cities_left'].remove(ant['start_point'])
         ant['path'] = [ant['start_point']]
-    return list_of_ants
+    return dict_of_ants
 
 
 def where_to_go(probabilities_table: np.array) -> int:
