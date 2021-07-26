@@ -13,22 +13,22 @@ def ant_system(cities: np.array,
     num_of_cities = cities.shape[0]
 
     # calculate start level of the pheromone
-    array_of_city_dist = calc_distance_array(cities)
-    max_dist = np.nanmax(array_of_city_dist,axis=1)
+    array_dist_between_cities = calc_distance_array(cities)
+    max_dist = np.nanmax(array_dist_between_cities,axis=1)
     tau_0 = 1/max_dist
 
     # create list of ants which will move through the cities
     list_of_ants = create_ants(k,num_of_cities)
 
     # initialization of decision table
-    array_of_base_pheromone = np.zeros((num_of_cities,num_of_cities))
-    array_of_pheromone = np.copy(array_of_base_pheromone)
+    array_base_pheromone = np.zeros((num_of_cities,num_of_cities))
+    array_pheromone = np.copy(array_base_pheromone)
     for i in range(num_of_cities):
         for j in range(num_of_cities):
             if(i==j):
-                array_of_base_pheromone[i][j] = np.nan
+                array_base_pheromone[i][j] = np.nan
             else:
-                array_of_base_pheromone[i][j] = tau_0[j]
+                array_base_pheromone[i][j] = tau_0[j]
 
     # in the first tour choose paths randomly
     for ant in list_of_ants:
@@ -48,10 +48,10 @@ def ant_system(cities: np.array,
         # sum up pheromone on each arc from this tour
         for first_city_idx, second_city_idx in \
                 zip(ant['path'][:-1],ant['path'][1:]):
-            array_of_pheromone[first_city_idx][second_city_idx] += 1 / ant['dist_traveled']
+            array_pheromone[first_city_idx][second_city_idx] += 1 / ant['dist_traveled']
 
     # calculate level of pheromone between cities
-    array_of_whole_pheromone = p*array_of_base_pheromone+array_of_pheromone
+    array_whole_pheromone = p*array_base_pheromone+array_pheromone
 
     # main loop of the algorithm
     for tour in range(num_of_tours):
@@ -69,8 +69,8 @@ def ant_system(cities: np.array,
                     if city_idx == actual_city_idx or city_idx not in ant['cities_left']:
                         semi_decision_table[city_idx] = np.nan
                     else:
-                        semi_decision_table[city_idx] = (array_of_whole_pheromone[actual_city_idx][city_idx]**\
-                                                    alpha) * ((1/array_of_city_dist[actual_city_idx][city_idx])**beta)
+                        semi_decision_table[city_idx] = (array_whole_pheromone[actual_city_idx][city_idx]**\
+                                                    alpha) * ((1/array_dist_between_cities[actual_city_idx][city_idx])**beta)
                 for j in range(num_of_cities):
                     decision_table[j] = semi_decision_table[j]/\
                                         np.nansum(semi_decision_table)
@@ -95,9 +95,9 @@ def ant_system(cities: np.array,
             # sum up pheromone on each arc from this tour
             for first_city_idx, second_city_idx in \
                     zip(ant['path'][:-1], ant['path'][1:]):
-                array_of_pheromone[first_city_idx][second_city_idx] += 1 / ant['dist_traveled']
+                array_pheromone[first_city_idx][second_city_idx] += 1 / ant['dist_traveled']
 
-        array_of_whole_pheromone = p*array_of_whole_pheromone+array_of_pheromone
+        array_whole_pheromone = p*array_whole_pheromone+array_pheromone
 
     list_of_ants = sorted(list_of_ants, key=lambda ant: ant['dist_traveled'])
     best_dist = list_of_ants[0]['dist_traveled']
@@ -145,16 +145,16 @@ def where_to_go(probabilities_table: np.array) -> int:
 
 def calc_distance_array(cities: np.array) -> np.array:
     num_of_cities = cities.shape[0]
-    array_of_city_dist = np.zeros((num_of_cities, num_of_cities))
+    array_dist_between_cities = np.zeros((num_of_cities, num_of_cities))
     for i in range(num_of_cities):
         for j in range(num_of_cities):
             if(i==j):
-                array_of_city_dist[i][j] = np.nan
+                array_dist_between_cities[i][j] = np.nan
             else:
                 city_dist = distance.euclidean(cities[i], cities[j])
-                array_of_city_dist[i][j] = city_dist
-                array_of_city_dist[j][i] = city_dist
-    return array_of_city_dist
+                array_dist_between_cities[i][j] = city_dist
+                array_dist_between_cities[j][i] = city_dist
+    return array_dist_between_cities
 
 
 def main():
@@ -169,9 +169,9 @@ def main():
     # pheromone evaporation coefficient
     p = 0.5
     # number of iterations
-    iterations = 200
+    num_of_iter = 200
 
-    best_score = ant_system(cities_file, k, iterations, alpha, beta, p)
+    best_score = ant_system(cities_file, k, num_of_iter, alpha, beta, p)
     print(best_score)
 
 if __name__ == '__main__':
