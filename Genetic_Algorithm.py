@@ -14,13 +14,14 @@ def genetic_algorithm(cities: np.array,
     list_population = create_initial_population(population_size, num_of_cities)
     list_population = evaluate_cost(list_population, cities)
 
-    while i in range(num_of_iter):
-        create_parent_population()
+    list_parents = []
+    for i in range(num_of_iter):
+        if len(list_parents) != 0:
+            list_parents = evaluate_cost(list_parents, cities)
+        # make list of parents of size n time population size
+        list_parents = roulette_wheel_algorithm(list_population, n)
 
-        offspring_array_size = 0
-        while offspring_array_size == n*p:
-            create_offspring()
-
+        list_offsprings = create_offsprings()
 
         create_parent_population()
 
@@ -43,12 +44,28 @@ def create_initial_population(population_size: int, num_of_cities) -> list:
     return list_population
 
 
-def evaluate_cost(list_parents: list, cities: np.array) -> list:
-    for parents in list_parents:
-        for list_idx in range(1,len(parents["parent_idx"])):
-            actual_city = cities[parents["parent_idx"][list_idx]]
-            previous_city = cities[parents["parent_idx"][list_idx-1]]
-            parents["dist_traveled"] += distance.euclidean(actual_city,previous_city)
+def evaluate_cost(list_population: list, cities: np.array) -> list:
+    for population_element in list_population:
+        for list_idx in range(1,len(population_element["parent_idx"])):
+            actual_city = cities[population_element["parent_idx"][list_idx]]
+            previous_city = cities[population_element["parent_idx"][list_idx-1]]
+            population_element["dist_traveled"] += distance.euclidean(actual_city,previous_city)
+    return list_population
+
+
+def roulette_wheel_algorithm(list_population: list, n: float) -> list:
+    sum_of_dist = sum([population_element['dist_traveled'] for population_element in list_population])
+    relative_probabilities = [population_element['dist_traveled']/sum_of_dist for population_element in list_population]
+    cumulative_probabilities = [sum(relative_probabilities[:i+1]) for i in range(len(relative_probabilities))]
+
+    list_parents = []
+    while (len(list_parents) < n*len(list_population)):
+        rand = random.uniform(0,1)
+
+        idx = 0
+        while(cumulative_probabilities[idx] < rand):
+            idx += 1
+        list_parents.append(list_population[idx])
     return list_parents
 
 
@@ -56,7 +73,9 @@ def mutation():
     pass
 
 
-def create_offspring():
+def create_offsprings():
+    rand_idx_1 = random.uniform(0,1)
+    rand_idx_2 = random.uniform(0,1)
     mutation()
     pass
 
