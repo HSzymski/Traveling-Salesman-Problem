@@ -9,23 +9,27 @@ def genetic_algorithm(cities: np.array,
                       n: float,
                       mutation_probability: float) -> int:
     num_of_cities = cities.shape[0]
-    #array_dist_between_cities = calc_distance_array(cities)
 
+    # Create initial population of population_size pahts
     list_population = create_initial_population(population_size, num_of_cities)
+    # Evaluate cost for whole population
     list_population = evaluate_cost(list_population, cities)
 
-    list_parents = []
     for i in range(num_of_iter):
         if len(list_parents) != 0:
-            list_parents = evaluate_cost(list_parents, cities)
+            list_population = evaluate_cost(list_parents, cities)
         # make list of parents of size n time population size
         list_parents = roulette_wheel_algorithm(list_population, n)
+        # create offsprings and perform cycle crossover with mutation on them
+        list_offsprings = create_offsprings(list_parents, mutation_probability)
+        # evaluate distances
+        list_offsprings = evaluate_cost(list_offsprings, cities)
 
-        list_offsprings = create_offsprings()
 
         create_parent_population()
 
-    pass
+    best_score = 0
+    return best_score
 
 
 def create_initial_population(population_size: int, num_of_cities) -> list:
@@ -69,15 +73,63 @@ def roulette_wheel_algorithm(list_population: list, n: float) -> list:
     return list_parents
 
 
-def mutation():
-    pass
+def create_offsprings(list_parents: list, mutation_probability: float) -> list:
+    list_offspring = []
+    while len(list_offspring) != len(list_parents):
+        rand_parent_1 = random.choice(list_parents)
+        rand_parent_2 = random.choice(list_parents)
+
+        offspring_1 = cycle_crossover_with_mutation(rand_parent_1["parent_idx"],
+                                                    rand_parent_2["parent_idx"],
+                                                    mutation_probability)
+        offspring_2 = cycle_crossover_with_mutation(rand_parent_2["parent_idx"],
+                                                    rand_parent_1["parent_idx"],
+                                                    mutation_probability)
+
+        list_offspring.append({"parent_idx": offspring_1,"dist_traveled":0})
+        list_offspring.append({"parent_idx": offspring_2,"dist_traveled":0})
+    return list_offspring
+
+def cycle_crossover_with_mutation(parent_idx_1: list, parent_idx_2: list, mutation_probability: float) -> list:
+    parent_without_return_1 = parent_idx_1[:-1]
+    parent_without_return_2 = parent_idx_2[:-1]
+    offspring = [-1 for i in range(len(parent_without_return_1))]
+    # Cycle crossover realized in 5 steps
+    # 1. Start with the frst unused position of O and the frst allele of P1
+    offspring[0] = parent_without_return_1[0]
+    # 2. Look at the allele in the same position in P2
+    value_to_find = parent_without_return_2[0]
+    for i in range(len(offspring)-1): # maximum possible number of iteration
+        # 3. Go to the position with the same allele in P1
+        value_idx = parent_without_return_1.index(value_to_find)
+        # 4. Add this allele into cycle
+        offspring[value_idx] = value_to_find
+        # 5. Repeat steps 2 through 4 until arrive at the frst allele of P1
+        value_to_find = parent_without_return_2[value_idx]
+        if value_to_find in offspring:
+            break
+    # check for mutation
+    offspring = mutation(offspring, mutation_probability)
+    # append starting point
+    offspring.append(offspring[0])
+    # fill other city indexes using second parent indexes
+    for idx, val in enumerate(offspring):
+        if val == -1:
+            offspring[idx] = parent_without_return_2[idx]
+    return offspring
 
 
-def create_offsprings():
-    rand_idx_1 = random.uniform(0,1)
-    rand_idx_2 = random.uniform(0,1)
-    mutation()
-    pass
+def mutation(offspring: dict, mutation_probability: float) -> dict:
+    # checking if offspring should mutate by using uniform distribution
+    rand = random.uniform(0,1)
+    if rand <= mutation_probability:
+        rand_idx_to_mutate_1 = random.randint(0,10)
+        while rand_idx_to_mutate_1 == rand_idx_to_mutate_2:
+            rand_idx_to_mutate_2 = random.randint(0,10)
+        value_safe_box = offspring[rand_idx_to_mutate_1]
+        offspring[rand_idx_to_mutate_1] = offspring[rand_idx_to_mutate_2]
+        offspring[rand_idx_to_mutate_2] = value_safe_box
+    return offspring
 
 
 def main():
