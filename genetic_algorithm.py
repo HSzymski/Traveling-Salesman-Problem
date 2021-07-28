@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from scipy.spatial import distance
+from typing import List
 
 
 def genetic_algorithm(cities: np.array,
@@ -36,7 +37,7 @@ def genetic_algorithm(cities: np.array,
     return best_score
 
 
-def create_initial_population(population_size: int, num_of_cities) -> list:
+def create_initial_population(population_size: int, num_of_cities) -> List[dict]:
     list_population = []
     # for each parent in population create list of indexes and
     # calculate total distance traveled (cost) equal to 0
@@ -51,7 +52,7 @@ def create_initial_population(population_size: int, num_of_cities) -> list:
     return list_population
 
 
-def evaluate_cost(list_population: list, cities: np.array) -> list:
+def evaluate_cost(list_population: List[dict], cities: np.array) -> List[dict]:
     for population_element in list_population:
         for list_idx in range(1,len(population_element['parent_idx'])):
             actual_city = cities[population_element['parent_idx'][list_idx]]
@@ -60,7 +61,7 @@ def evaluate_cost(list_population: list, cities: np.array) -> list:
     return list_population
 
 
-def roulette_wheel_algorithm(list_population: list, population_size: int, n: float) -> list:
+def roulette_wheel_algorithm(list_population: List[dict], population_size: int, n: float) -> List[dict]:
     # checking maximum value of dist_traveled to scale date for calculating probabilities
     max_list_val = 0
     for population_element in list_population:
@@ -83,7 +84,7 @@ def roulette_wheel_algorithm(list_population: list, population_size: int, n: flo
     return list_parents
 
 
-def create_offsprings(list_parents: list, mutation_probability: float) -> list:
+def create_offsprings(list_parents: List[dict], mutation_probability: float) -> list:
     list_offspring = []
     while len(list_offspring) != len(list_parents):
         rand_parent_1 = random.choice(list_parents)

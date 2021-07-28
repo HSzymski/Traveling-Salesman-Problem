@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import random
 from scipy.spatial import distance
+from typing import List
 
 def ant_system(cities: np.array,
                k: int,
@@ -103,7 +104,7 @@ def ant_system(cities: np.array,
     best_dist = list_of_ants[0]['dist_traveled']
     return best_dist
 
-def create_ants(num_of_ants: int, num_of_cities: int) -> list:
+def create_ants(num_of_ants: int, num_of_cities: int) -> List[dict]:
     list_of_ants = []
     for i in range(num_of_ants):
         rand_start_point = np.random.randint(0,num_of_cities-1)
@@ -115,7 +116,7 @@ def create_ants(num_of_ants: int, num_of_cities: int) -> list:
     return list_of_ants
 
 
-def restart_ants(list_of_ants: list, num_of_cities: int) -> list:
+def restart_ants(list_of_ants: List[dict], num_of_cities: int) -> List[dict]:
     for ant in list_of_ants:
         ant['dist_traveled'] = 0
         ant["cities_left"] = list(range(num_of_cities))
