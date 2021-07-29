@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from scipy.spatial import distance
-from typing import List
+from typing import List, Tuple
 
 
 def genetic_algorithm(cities: np.array,
@@ -9,16 +9,29 @@ def genetic_algorithm(cities: np.array,
                       num_of_iter: int,
                       n: float,
                       mutation_probability: float,
-                      selection: str) -> int:
+                      selection: str) -> Tuple[float, float]:
+    """
+    Solving Traveling Salesman Problem using Genetic Algorithm
+
+    :param cities: 2D numpy array of cities
+    :param population_size: population used to find best path
+    :param num_of_iter: number of iterations
+    :param n: parent to population population size ratio
+    :param mutation_probability: probability of population element mutation
+    :param selection: selection algorithm used to determine parent population from
+    whole population. Can obtain two values: "roulette_wheel" or "kbest"
+    :return: best score (as an int) and best route (indexes of the cities) found
+    """
     num_of_cities = cities.shape[0]
 
-    # create initial population of population_size pahts
+    # create initial population of population_size paths
     list_population = create_initial_population(population_size, num_of_cities)
     # evaluate cost for whole population
     list_population = evaluate_cost(list_population, cities)
     if selection == "kbest":
         list_population = sorted(list_population, key=lambda population_element: population_element['dist_traveled'])
 
+    list_parents = []
     for i in range(num_of_iter):
         # make list of parents of size n times population size by different types of selection
         if selection == "roulette_wheel":
@@ -32,9 +45,9 @@ def genetic_algorithm(cities: np.array,
         # concatenate parents and offsprings to create new population, then sort them by distances
         list_population = list_parents + list_offsprings
         list_population = sorted(list_population, key=lambda population_element: population_element['dist_traveled'])
-        print("Iteration number: ",i)
     best_score = list_population[0]['dist_traveled']
-    return best_score
+    best_path = list_population[0]['path']
+    return best_score, best_path
 
 
 def create_initial_population(population_size: int, num_of_cities) -> List[dict]:
@@ -48,16 +61,16 @@ def create_initial_population(population_size: int, num_of_cities) -> List[dict]
 
         # add idx of the first city
         list_of_cities_idx.append(list_of_cities_idx[0])
-        list_population.append({'parent_idx': list_of_cities_idx, 'dist_traveled': 0})
+        list_population.append({'path': list_of_cities_idx, 'dist_traveled': 0})
     return list_population
 
 
 def evaluate_cost(list_population: List[dict], cities: np.array) -> List[dict]:
     for population_element in list_population:
-        for list_idx in range(1,len(population_element['parent_idx'])):
-            actual_city = cities[population_element['parent_idx'][list_idx]]
-            previous_city = cities[population_element['parent_idx'][list_idx-1]]
-            population_element['dist_traveled'] += distance.euclidean(actual_city,previous_city)
+        for list_idx in range(1, len(population_element['path'])):
+            actual_city = cities[population_element['path'][list_idx]]
+            previous_city = cities[population_element['path'][list_idx-1]]
+            population_element['dist_traveled'] += distance.euclidean(actual_city, previous_city)
     return list_population
 
 
@@ -70,15 +83,16 @@ def roulette_wheel_algorithm(list_population: List[dict], population_size: int, 
     # calculating sum of distances
     sum_of_dist = sum([max_list_val-population_element['dist_traveled'] for population_element in list_population])
     # relative probabilities for each element of population
-    relative_probabilities = [(max_list_val-population_element['dist_traveled'])/sum_of_dist for population_element in list_population]
+    relative_probabilities = [(max_list_val-population_element['dist_traveled'])/sum_of_dist
+                              for population_element in list_population]
     # cumulative probabilities for each element of population
     cumulative_probabilities = [sum(relative_probabilities[:i+1]) for i in range(len(relative_probabilities))]
     list_parents = []
     # selection loop
-    while (len(list_parents) < n*population_size):
-        rand = random.uniform(0,1)
+    while len(list_parents) < n*population_size:
+        rand = random.uniform(0, 1)
         idx = 0
-        while(cumulative_probabilities[idx] < rand):
+        while cumulative_probabilities[idx] < rand:
             idx += 1
         list_parents.append(list_population[idx])
     return list_parents
@@ -90,27 +104,28 @@ def create_offsprings(list_parents: List[dict], mutation_probability: float) -> 
         rand_parent_1 = random.choice(list_parents)
         rand_parent_2 = random.choice(list_parents)
 
-        offspring_1 = cycle_crossover_with_mutation(rand_parent_1['parent_idx'],
-                                                    rand_parent_2['parent_idx'],
+        offspring_1 = cycle_crossover_with_mutation(rand_parent_1['path'],
+                                                    rand_parent_2['path'],
                                                     mutation_probability)
-        offspring_2 = cycle_crossover_with_mutation(rand_parent_2['parent_idx'],
-                                                    rand_parent_1['parent_idx'],
+        offspring_2 = cycle_crossover_with_mutation(rand_parent_2['path'],
+                                                    rand_parent_1['path'],
                                                     mutation_probability)
 
-        list_offspring.append({'parent_idx': offspring_1,'dist_traveled':0})
-        list_offspring.append({'parent_idx': offspring_2,'dist_traveled':0})
+        list_offspring.append({'path': offspring_1, 'dist_traveled': 0})
+        list_offspring.append({'path': offspring_2, 'dist_traveled': 0})
     return list_offspring
 
-def cycle_crossover_with_mutation(parent_idx_1: list, parent_idx_2: list, mutation_probability: float) -> list:
-    parent_without_return_1 = parent_idx_1[:-1]
-    parent_without_return_2 = parent_idx_2[:-1]
-    offspring = [-1 for i in range(len(parent_without_return_1))]
+
+def cycle_crossover_with_mutation(path_1: list, path_2: list, mutation_probability: float) -> list:
+    parent_without_return_1 = path_1[:-1]
+    parent_without_return_2 = path_2[:-1]
+    offspring = [-1] * len(parent_without_return_1)
     # Cycle crossover realized in 5 steps
     # 1. start with the frst unused position of O and the frst allele of P1
     offspring[0] = parent_without_return_1[0]
     # 2. look at the allele in the same position in P2
     value_to_find = parent_without_return_2[0]
-    for i in range(len(offspring)-1): # maximum possible number of iteration
+    for i in range(len(offspring)-1):  # maximum possible number of iteration
         # 3. go to the position with the same allele in P1
         value_idx = parent_without_return_1.index(value_to_find)
         # 4. add this allele into cycle
@@ -130,44 +145,16 @@ def cycle_crossover_with_mutation(parent_idx_1: list, parent_idx_2: list, mutati
     return offspring
 
 
-def mutation(offspring: dict, mutation_probability: float) -> dict:
+def mutation(offspring: list, mutation_probability: float) -> list:
     # checking if offspring should mutate by using uniform distribution
-    rand = random.uniform(0,1)
+    rand = random.uniform(0, 1)
     if rand <= mutation_probability:
         # generate two different random indexes to swap values between them
-        rand_idx_to_mutate_1 = random.randint(0,9)
-        rand_idx_to_mutate_2 = random.randint(0,9)
+        rand_idx_to_mutate_1 = random.randint(0, 9)
+        rand_idx_to_mutate_2 = random.randint(0, 9)
         while rand_idx_to_mutate_1 == rand_idx_to_mutate_2:
-            rand_idx_to_mutate_2 = random.randint(0,9)
+            rand_idx_to_mutate_2 = random.randint(0, 9)
         value_safe_box = offspring[rand_idx_to_mutate_1]
         offspring[rand_idx_to_mutate_1] = offspring[rand_idx_to_mutate_2]
         offspring[rand_idx_to_mutate_2] = value_safe_box
     return offspring
-
-
-def main():
-    # reading data
-    cities_file = np.loadtxt('Data\cities_4.txt').T
-
-    # population size
-    population_size = 250
-    # parent to population population size ratio
-    n = 0.8
-    # probability of mutation
-    mutation_probability = 0.2
-    # number of iterations
-    num_of_iter = 1000
-    # algorithm used to select parents from population
-    selection = "roulette_wheel"
-    # selection = "kbest"
-
-    best_score = genetic_algorithm(cities_file,
-                                   population_size,
-                                   num_of_iter,
-                                   n ,
-                                   mutation_probability,
-                                   selection)
-    print(best_score)
-
-if __name__ == '__main__':
-    main()
