@@ -6,26 +6,29 @@ from typing import Tuple
 
 def simulated_annealing(cities: np.array,
                         initial_temperature: float,
+                        minimum_temperature: float,
                         alpha: float,
                         beta: float,
                         scheduling: str) -> Tuple[float, float]:
-    num_of_iter = 10000
     num_of_cities = cities.shape[0]
     temperature = initial_temperature
-    element = dict()
+    # generate random solution and set it as the best, calculate distance between cities
     best_element = generate_one_path(num_of_cities)
     best_element = evaluate_cost(best_element, cities)
 
-    minimum_temperature = 1  
-
-    while num_of_iter != 0 or temperature < minimum_temperature:
-        element = generate_one_path(num_of_cities)
+    element = {}
+    while temperature > minimum_temperature:
+        # mutation of the best solution, calculate distance between cities
+        element = swap_mutation(best_element)
         element = evaluate_cost(element, cities)
+        # if new solution is better than actual best change elements, else check probability
+        # of accepting worst solution with random number
         if element['dist_traveled'] < best_element['dist_traveled']:
             best_element = element
         else:
             rand = random.uniform(0, 1)
-            if rand < np.exp((best_element['dist_traveled'] - element['dist_traveled'])/initial_temperature):
+            p = np.exp((best_element['dist_traveled'] - element['dist_traveled'])/temperature)
+            if rand < p:
                 best_element = element
 
         # temperature scheduling
@@ -33,8 +36,6 @@ def simulated_annealing(cities: np.array,
             temperature = alpha*temperature
         elif scheduling == 'inverse':
             temperature = temperature/(1+beta*temperature)
-
-        num_of_iter -= 1
 
     best_score = element['dist_traveled']
     best_path = element['path']
@@ -52,6 +53,7 @@ def generate_one_path(num_of_cities: int) -> dict:
 
 
 def evaluate_cost(element: dict, cities: np.array) -> dict:
+    # calculate euclidean dist between each cities and sum up them
     for list_idx in range(1, len(element['path'])):
         actual_city = cities[element['path'][list_idx]]
         previous_city = cities[element['path'][list_idx - 1]]
@@ -59,13 +61,40 @@ def evaluate_cost(element: dict, cities: np.array) -> dict:
     return element
 
 
+def swap_mutation(best_element: dict) -> dict:
+    # copy dictionary to avoid changing of original dictionary and change its distance to 0
+    element = best_element.copy()
+    element['dist_traveled'] = 0
+    # cut off last city - the same as first (return of the salesman to source city)
+    path = best_element['path'][:-1]
+    # choose to different indexes and swap element of the list using it
+    city_idx_1 = random.randint(0, len(path)-1)
+    city_idx_2 = random.randint(0, len(path)-1)
+    while city_idx_2 == city_idx_1:
+        city_idx_2 = random.randint(0, len(path)-1)
+    path[city_idx_1], path[city_idx_2] = path[city_idx_2], path[city_idx_1]
+    # return of the salesman
+    path.append(path[0])
+    # rewrite changed element
+    element['path'] = path
+    return element
+
+
 def main():
+
     cities = np.loadtxt(r"Data\cities_4.txt").T
-    initial_temperature = 10**6
-    alpha = 0.9999
+    initial_temperature = 10*6
+    minimum_temperature = 0.01
+    alpha = 0.998
     beta = 1 - alpha
-    scheduling = 'exponential'
-    best_score, best_path = simulated_annealing(cities, initial_temperature, alpha, beta, scheduling)
+    # scheduling = 'exponential'
+    scheduling = 'inverse'
+    best_score, best_path = simulated_annealing(cities,
+                                                initial_temperature,
+                                                minimum_temperature,
+                                                alpha,
+                                                beta,
+                                                scheduling)
     print(best_score, best_path)
 
 
