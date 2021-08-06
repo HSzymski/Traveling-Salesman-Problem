@@ -9,7 +9,7 @@ def genetic_algorithm(cities: np.array,
                       num_of_iter: int,
                       n: float,
                       mutation_probability: float,
-                      selection: str) -> Tuple[float, float]:
+                      selection: str) -> Tuple[float, list]:
     """
     Solving Traveling Salesman Problem using Genetic Algorithm
 
@@ -20,7 +20,7 @@ def genetic_algorithm(cities: np.array,
     :param mutation_probability: probability of population element mutation
     :param selection: selection algorithm used to determine parent population from
     whole population. Can obtain two values: "roulette_wheel" or "kbest"
-    :return: best score (as an int) and best route (indexes of the cities) found
+    :return: best score (as an float) and best route (indexes of the cities) found
     """
     num_of_cities = cities.shape[0]
 
@@ -149,12 +149,11 @@ def mutation(offspring: list, mutation_probability: float) -> list:
     # checking if offspring should mutate by using uniform distribution
     rand = random.uniform(0, 1)
     if rand <= mutation_probability:
-        # generate two different random indexes to swap values between them
-        rand_idx_to_mutate_1 = random.randint(0, 9)
-        rand_idx_to_mutate_2 = random.randint(0, 9)
-        while rand_idx_to_mutate_1 == rand_idx_to_mutate_2:
-            rand_idx_to_mutate_2 = random.randint(0, 9)
-        value_safe_box = offspring[rand_idx_to_mutate_1]
-        offspring[rand_idx_to_mutate_1] = offspring[rand_idx_to_mutate_2]
-        offspring[rand_idx_to_mutate_2] = value_safe_box
+        # choose to different indexes and swap element of the list using it
+        city_idx_1 = random.randint(0, len(offspring) - 1)
+        city_idx_2 = random.randint(0, len(offspring) - 1)
+        while city_idx_2 == city_idx_1:
+            city_idx_2 = random.randint(0, len(offspring) - 1)
+        offspring[city_idx_1], offspring[city_idx_2] = \
+            offspring[city_idx_2], offspring[city_idx_1]
     return offspring
