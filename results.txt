@@ -1,0 +1,8 @@
+Mean best distances:
+Ant system: 44.18068965348993
+Genetic algorithm: 43.96289554684039
+Simulated annealing: 55.86560420904444
+Mean times:
+Ant system: 12.768581318855286
+Genetic algorithm: 28.97654670079549
+Simulated annealing: 6.002122489611308
