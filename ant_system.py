@@ -9,7 +9,7 @@ def ant_system(cities: np.array,
                num_of_tours: int,
                alpha: float,
                beta: float,
-               p: float) -> Tuple[float, float]:
+               p: float) -> Tuple[float, list]:
     """
     Solving Traveling Salesman Problem using Ant System Algorithm
 
@@ -19,7 +19,7 @@ def ant_system(cities: np.array,
     :param alpha: control parameter
     :param beta: control parameter
     :param p: pheromone evaporation coefficient
-    :return: best score (as an int) and best route (indexes of the cities) found
+    :return: best score (as an float) and best route (indexes of the cities) found
     """
     # number of cities
     num_of_cities = cities.shape[0]
