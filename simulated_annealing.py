@@ -8,8 +8,18 @@ def simulated_annealing(cities: np.array,
                         initial_temperature: float,
                         minimum_temperature: float,
                         alpha: float,
-                        beta: float,
-                        scheduling: str) -> Tuple[float, float]:
+                        scheduling: str) -> Tuple[float, list]:
+    """
+    Solving Traveling Salesman Problem using Genetic Algorithm
+
+    :param cities: 2D numpy array of cities
+    :param initial_temperature: starting temperature
+    :param minimum_temperature: when our temperature reached that level algorithm working ends
+    :param alpha: parameter used to scheduling calculation
+    :param scheduling: define how temperature is decreasing. Can obtain two values: "exponential" or "inverse"
+    :return: best score (as an float) and best route (indexes of the cities) found
+    """
+
     num_of_cities = cities.shape[0]
     temperature = initial_temperature
     # generate random solution and set it as the best, calculate distance between cities
@@ -35,6 +45,7 @@ def simulated_annealing(cities: np.array,
         if scheduling == 'exponential':
             temperature = alpha*temperature
         elif scheduling == 'inverse':
+            beta = 1 - alpha
             temperature = temperature/(1+beta*temperature)
 
     best_score = element['dist_traveled']
@@ -78,24 +89,3 @@ def swap_mutation(best_element: dict) -> dict:
     # rewrite changed element
     element['path'] = path
     return element
-
-
-def main():
-
-    cities = np.loadtxt(r"Data\cities_4.txt").T
-    initial_temperature = 10*6
-    minimum_temperature = 0.01
-    alpha = 0.998
-    beta = 1 - alpha
-    # scheduling = 'exponential'
-    scheduling = 'inverse'
-    best_score, best_path = simulated_annealing(cities,
-                                                initial_temperature,
-                                                minimum_temperature,
-                                                alpha,
-                                                beta,
-                                                scheduling)
-    print(best_score, best_path)
-
-
-main()
