@@ -1,6 +1,16 @@
 # Traveling-Salesman-Problem
 ## Ant System
 ## Genetic Algorithm
+Pseudocode:
+1. Create initial population of P elements.
+2. Evaluate the cost of each individual - the total distance to be traveled.
+3. Using proportional selection choose n*P parents (0 < n <= 1).
+4. Select randomly two parents and create offspring using Cycle Crossover Operator (CX).
+5. Repeat the Step 4 until n*P offspring are generated.
+6. Apply mutation operators (swap mutation) for changes in randomly selected offspring
+7. Replace old parent population with the best P individuals (of minimum cost) from the combined parents and offspring populations.
+8. Repeat the Step 2 until maximum number of generations were performed.
+
 ## Simulated Annealing
 ## Results
 Tests was made for cities from cities_4.txt file, which consist of 10 cities placed in two dimensional space. Each algorithm was ran 30 times, working time and the best score (distance of the best route) were noticed.
