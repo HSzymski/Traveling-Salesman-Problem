@@ -1,10 +1,12 @@
-# Traveling-Salesman-Problem
+# Traveling Salesman Problem
+The Traveling Salesman Problem (TSP) is one of the well known benchmark for algorithms. In TSP there are a list of cities, in most cases with a fully grid of connections. The title salesman needs to visit all the cities and return to the starting one in a way that a total distance traveled is the shortest. Considering the symmetric TSP (TSP for which distance from i-th city to the j-th city is the same as from j-th to i-th), the number of possible solutions is (N-1)!/2.
+
 ## Ant System
 
 ## Genetic Algorithm
 In the field of computer science and operations research, genetic algorithm (GA) is an derivative-free (do not need derivative to find optimal solution, sometimes information about the derivative of the objective function is unavailable, unreliable or impractical to obtain), stochastic (being well described by a random probability distribution) algorithm, which inspiration was the process of natural selection - "Survival of the fittest"[1]. Finding optimal solution is achievable by biologically inspired operators such as mutation, crossover and selection[2].
 
-A structure of a simple GA used to solve TSP problem:
+A structure of a simple GA used to solve TSP problem, implemented in that repository:
 1. Create initial population of P elements.
 2. Evaluate the cost of each individual - the total distance to be traveled.
 3. Using proportional selection choose n*P parents (0 < n <= 1).
@@ -28,5 +30,5 @@ According the plot above, 3 different times were defined (10, 20 and 30 seconds)
 ![results30](https://user-images.githubusercontent.com/32731885/129105341-644fea54-2a4d-447f-8e59-ed5701a2ac82.png)
 
 
-[1] C. Darwin, On the origin of species by means of natural selection, or the preservation of favoured races in the struggle for life. London: John Murray, 1869.
+[1] C. Darwin, On the origin of species by means of natural selection, or the preservation of favoured races in the struggle for life. London: John Murray, 1869. <br>
 [2] Mitchell, Melanie, An Introduction to Genetic Algorithms. Cambridge, MA: MIT Press. ISBN 9780585030944, 1996.
