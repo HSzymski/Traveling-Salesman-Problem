@@ -1,6 +1,9 @@
 # Traveling-Salesman-Problem
 ## Ant System
+
 ## Genetic Algorithm
+In the field of computer science and operations research, is an derivative-free (do not need derivative to find optimal solution. Sometimes information about the derivative of the objective function is unavailable, unreliable or impractical to obtain), stochastic () algorithm which inspiration was the process of natural selection. 
+
 Pseudocode:
 1. Create initial population of P elements.
 2. Evaluate the cost of each individual - the total distance to be traveled.
@@ -12,6 +15,7 @@ Pseudocode:
 8. Repeat the Step 2 until maximum number of generations were performed.
 
 ## Simulated Annealing
+
 ## Results
 Tests was made for cities from cities_4.txt file, which consist of 10 cities placed in two dimensional space. Each algorithm was ran 30 times, working time and the best score (distance of the best route) were noticed.
 
