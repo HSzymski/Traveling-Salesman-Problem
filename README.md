@@ -2,9 +2,9 @@
 ## Ant System
 
 ## Genetic Algorithm
-In the field of computer science and operations research, is an derivative-free (do not need derivative to find optimal solution. Sometimes information about the derivative of the objective function is unavailable, unreliable or impractical to obtain), stochastic () algorithm which inspiration was the process of natural selection. 
+In the field of computer science and operations research, genetic algorithm (GA) is an derivative-free (do not need derivative to find optimal solution, sometimes information about the derivative of the objective function is unavailable, unreliable or impractical to obtain), stochastic (being well described by a random probability distribution) algorithm, which inspiration was the process of natural selection - "Survival of the fittest"[1]. Finding optimal solution is achievable by biologically inspired operators such as mutation, crossover and selection[2].
 
-Pseudocode:
+A structure of a simple GA used to solve TSP problem:
 1. Create initial population of P elements.
 2. Evaluate the cost of each individual - the total distance to be traveled.
 3. Using proportional selection choose n*P parents (0 < n <= 1).
@@ -28,3 +28,5 @@ According the plot above, 3 different times were defined (10, 20 and 30 seconds)
 ![results30](https://user-images.githubusercontent.com/32731885/129105341-644fea54-2a4d-447f-8e59-ed5701a2ac82.png)
 
 
+[1] C. Darwin, On the origin of species by means of natural selection, or the preservation of favoured races in the struggle for life. London: John Murray, 1869.
+[2] Mitchell, Melanie, An Introduction to Genetic Algorithms. Cambridge, MA: MIT Press. ISBN 9780585030944, 1996.
