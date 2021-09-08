@@ -17,6 +17,16 @@ A structure of a simple GA used to solve TSP problem, implemented in that reposi
 8. Repeat the Step 2 until maximum number of generations were performed.
 
 ## Simulated Annealing
+An optimization method which name comes from annealing in metallurgy, a technique involving heating and controlled cooling of a material to alter its physical properties. Each step of annealing has its representation in the code: temperature (range of search space exploration), getting new geometry (change of candidate solution) and cooling process (deceasing the range of exploration).
+
+Pseudocode for Simulated Annealing:
+1. Create initial path (candidate solution) and set temperature T.
+2. Create new path.
+3. If new path is better than previous, set it as a new candidate solution.
+4. If new path is worse than previous check the probability of setting it as the new candidate solution.
+5. Decrease the temperature T using cooling schedules.
+6. Repeat the Step 2 until termination criterion was achieved.
+
 
 ## Results
 Tests was made for cities from cities_4.txt file, which consist of 10 cities placed in two dimensional space. Each algorithm was ran 30 times, working time and the best score (distance of the best route) were noticed.
