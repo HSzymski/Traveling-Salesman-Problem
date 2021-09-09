@@ -2,6 +2,22 @@
 The Traveling Salesman Problem (TSP) is one of the well known benchmark for algorithms. In TSP there are a list of cities, in most cases with a fully grid of connections. The title salesman needs to visit all the cities and return to the starting one in a way that a total distance traveled is the shortest. Considering the symmetric TSP (TSP for which distance from i-th city to the j-th city is the same as from j-th to i-th), the number of possible solutions is (N-1)!/2.
 
 ## Ant System
+Is a probabilistic technique for solving difficult computational problems. It's inspiration was the study of real ant traveling. While ants are traveling, they deposit on the ground a pheromone - substance which is used as a probability of choosing the same path by another ant. The more ants choose the same path the higher concentration of pheromone on that path is and the higher probability that others ants choose that path. From the other side there is also process called evaporation, decreasing concentration of pheromone over time. 
+
+Psudocode of my implementation of Ant System:
+1. Create initial population of k ants.
+2. Move ant randomly to an unvisited city.
+3. Repeat the Step 2 until ant visit all cities.
+4. Calculate pheromone left by ant at each arc (path between two cities).
+5. Repeat the Step 2 for each ant in population.
+6. Update pheromone concentration on each arc.
+7. Create another population of k ants.
+8. Select next city to go from not visited yet by summing up probabilities of choosing pahts and uniform distribution.
+9. Calculate probabilities of choosing each arc
+10. Move ant to the unvisited city choosed by adding up successive probabilities and comparing them with a randomly generated number from uniform distribution.
+11. Same as the Steps 3-6.
+12. Repeat the Step 7 until maximum number of tours were achieved.
+
 
 ## Genetic Algorithm
 In the field of computer science and operations research, genetic algorithm (GA) is an derivative-free (do not need derivative to find optimal solution, sometimes information about the derivative of the objective function is unavailable, unreliable or impractical to obtain), stochastic (being well described by a random probability distribution) algorithm, which inspiration was the process of natural selection - "Survival of the fittest"[1]. Finding optimal solution is achievable by biologically inspired operators such as mutation, crossover and selection[2].
